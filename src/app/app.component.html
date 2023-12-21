@@ -1,0 +1,43 @@
+
+<div class="container">
+    <div class="container" style="margin-bottom: 10px;">
+        <div class="card">
+            <p-messages [(value)]="messages" [enableService]="false" [closable]="false"></p-messages>
+        </div>
+    </div>
+    <div class="row rv">
+        <div class="col-4"><h4>Röle 1</h4></div>
+        <div class="col-4"><p-toggleButton [(ngModel)]="button0" (onChange)="callbackFun($event,0)" onLabel={{buttonTextRun}} offLabel={{buttonTextStop}}></p-toggleButton></div>
+        
+    </div>
+    <div class="row rv">
+        <div class="col-4"><h4>Röle 2</h4></div>
+        <div class="col-4"><p-toggleButton [(ngModel)]="button1" (onChange)="callbackFun($event,1)" onLabel={{buttonTextRun}} offLabel={{buttonTextStop}}></p-toggleButton></div>
+    </div>
+    <div class="row rv">
+        <div class="col-4"><h4>Röle 3</h4></div>
+        <div class="col-4"><p-toggleButton [(ngModel)]="button2" (onChange)="callbackFun($event,2)" onLabel={{buttonTextRun}} offLabel={{buttonTextStop}}></p-toggleButton></div>
+    </div>
+    <div class="row rv">
+        <div class="col-4"><h4>Röle 4</h4></div>
+        <div class="col-4"><p-toggleButton [(ngModel)]="button3" (onChange)="callbackFun($event,3)" onLabel={{buttonTextRun}} offLabel={{buttonTextStop}}></p-toggleButton></div>
+        
+    </div>
+    <div class="row rv">
+        <div class="col-4"><h4>Röle 5</h4></div>
+        <div class="col-4"><p-toggleButton [(ngModel)]="button4" (onChange)="callbackFun($event,4)" onLabel={{buttonTextRun}} offLabel={{buttonTextStop}}></p-toggleButton></div>
+    </div>
+    <div class="row rv">
+        <div class="col-4"><h4>Röle 6</h4></div>
+        <div class="col-4"><p-toggleButton [(ngModel)]="button5" (onChange)="callbackFun($event,5)" onLabel={{buttonTextRun}} offLabel={{buttonTextStop}}></p-toggleButton></div>
+    </div>
+    <div class="row rv">
+        <div class="col-4"><h4>Röle 7</h4></div>
+        <div class="col-4"><p-toggleButton [(ngModel)]="button6" (onChange)="callbackFun($event,6)" onLabel={{buttonTextRun}} offLabel={{buttonTextStop}}></p-toggleButton></div>
+    </div>
+    <div class="row rv">
+        <div class="col-4"><h4>Röle 8</h4></div>
+        <div class="col-4"><p-toggleButton [(ngModel)]="button7" (onChange)="callbackFun($event,7)" onLabel={{buttonTextRun}} offLabel={{buttonTextStop}}></p-toggleButton></div>
+    </div>
+</div>
+<router-outlet></router-outlet>
