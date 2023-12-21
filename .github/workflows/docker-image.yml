@@ -15,4 +15,4 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker buildx build --platform linux/amd64,linux/arm64/v8,linux/arm64 -t omka/homeasistantview:latest
+      run: docker buildx build --platform linux/amd64, linux/arm64/v8, linux/arm64 -t omka/homeasistantview:latest
