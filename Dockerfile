@@ -11,7 +11,7 @@ RUN npm run build
 
 FROM nginx:1.17.1-alpine
 
-COPY --from=build /usr/local/app/dist/home-controller/browser /usr/share/nginx/html
+COPY --from=build /usr/local/app/dist/omkahomeassistantview/browser /usr/share/nginx/html
 ADD  nginx.conf /etc/nginx/conf.d/default.conf
 ADD  docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
 
