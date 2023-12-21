@@ -4,6 +4,7 @@ import { PinStatResponse } from './PinStatResponse';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { Message } from 'primeng/api';
 import { environment } from '../enviroments/environment';
+import { PortInfoDto } from './Dto/PortInfoDto';
 
 @Component({
   selector: 'app-root',
@@ -12,19 +13,11 @@ import { environment } from '../enviroments/environment';
 })
 export class AppComponent implements OnInit {
   title = 'HomeController';
-  button0:boolean=true;
-  button1:boolean=true;
-  button2:boolean=true;
-  button3:boolean=true;
-  button4:boolean=true;
-  button5:boolean=true;
-  button6:boolean=true;
-  button7:boolean=true;
-  button8:boolean=true;
-  checked: boolean=true;
   messages: Message[] =[];
   buttonTextRun:string="Açık";
   buttonTextStop:string="Kapalı";
+
+  portInfoList:PortInfoDto[]=[];
 
   serverurl:string="";
   constructor(private client:HttpClient)
@@ -33,16 +26,15 @@ export class AppComponent implements OnInit {
   }
   ngOnInit(): void
    {
-   this.serverurl= environment.serverUrl;
-    console.log(this.serverurl);
-
-    this.getPinValue();
-   
+    const env = '{{APP_ENV}}'.replace(/^\s+|\s+$/g, '');
+    this.serverurl= environment.serverUrl;
+    console.log("ortm değişkeni",env);
+    this.getPortinfo()
   }
   setPinValue(pin:Number,stat:boolean)
   {
     this.client.post<PinStatResponse[]>(this.serverurl+"Esp/EspSetValue",{pin:pin,stat:stat}).subscribe(x=>{
-      this.calcButtonEffect(x);
+      this.getPortinfo();
       this.messages = [{ severity: 'success', summary: 'Success', detail: 'Esp Modül bağlantısı Başarılı' }];
     },e=>{
 
@@ -51,77 +43,23 @@ export class AppComponent implements OnInit {
     );
   }
 
-  getPinValue()
-  {
-    this.client.get<PinStatResponse[]>(this.serverurl+"Esp/EspGetValue").subscribe(x=>{
-      this.calcButtonEffect(x);
-      this.messages = [{ severity: 'success', summary: 'Success', detail: 'Esp Modül bağlantısı Başarılı' }];
-    },e=>{
-      this.messages = [{ severity: 'error', summary: 'Error', detail:"Modüle Erişilemedi"}];
-    });
-  }
-
-   calcButtonEffect(stats:PinStatResponse[])
-   {
-    stats.forEach(x=>{
-
-      switch(x.pin){
-        case 0:
-          {
-            this.button0=x.value >0 ? true : false;
-            break;
-          }
-        case 1:
-          {
-            this.button1=x.value >0 ? true : false;
-            break;
-          }
-        case 2:
-          {
-            this.button2=x.value >0 ? true : false;
-            break;
-          }
-        case 3:
-          {
-            this.button3=x.value >0 ? true : false;
-            break;
-          }
-        case 4:
-          {
-            this.button4=x.value >0 ? true : false;
-            break;
-          }
-        case 5:
-          {
-            this.button5=x.value >0 ? true : false;
-             break;
-          }
-        case 6:
-          {
-            this.button6=x.value >0 ? true : false;
-            break;
-          }
-        case 7:
-          {
-            this.button7=x.value >0 ? true : false;
-            break;
-          }
-        case 8:
-          {
-            this.button8=x.value >0 ? true : false;
-            break;
-          }
-      }
-      console.log(x);
-    });
-
-   }
+  
 
    callbackFun(event:any,pin:number)
    {
       let check:boolean=event.checked?false:true;
       this.setPinValue(pin,check)
-      
+   }
+
+   getPortinfo()
+   {
+    this.client.get<PortInfoDto[]>(this.serverurl+"Esp/GetPortProps").subscribe(x=>{
+       console.log(x);
+       this.portInfoList=x;
+    },e=>{
+      this.messages = [{ severity: 'error', summary: 'Error', detail:"Modüle Erişilemedi"}];
+    });
+
    }
 
 }
