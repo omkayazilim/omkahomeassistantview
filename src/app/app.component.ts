@@ -33,8 +33,9 @@ export class AppComponent implements OnInit {
   }
   ngOnInit(): void
    {
-    this.serverurl= environment.serverUrl;
-    console.log(environment.production,this.serverurl);
+   this.serverurl= environment.serverUrl;
+    console.log(this.serverurl);
+
     this.getPinValue();
    
   }
