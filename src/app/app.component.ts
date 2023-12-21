@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { PinStatResponse } from './PinStatResponse';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { Message } from 'primeng/api';
-import { environment } from '../enviroments/enviroment';
+import { environment } from '../enviroments/environment';
 
 @Component({
   selector: 'app-root',
@@ -33,9 +33,8 @@ export class AppComponent implements OnInit {
   }
   ngOnInit(): void
    {
-    this.serverurl= environment.appconfig.serverurl;
-    const env = '{{APP_ENV}}'.replace(/^\s+|\s+$/g, '');
-    console.log(env,this.serverurl);
+    this.serverurl= environment.serverUrl;
+    console.log(environment.production,this.serverurl);
     this.getPinValue();
    
   }

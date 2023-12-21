@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "HomeController": {
+    "omkahomeassistantview": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -24,7 +24,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/home-controller",
+            "outputPath": "dist/omkahomeassistantview",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -41,7 +41,8 @@
             ],
             "scripts": []
           },
-          "configurations": {
+          "configurations": 
+          {
             "production": {
               "budgets": [
                 {
@@ -55,12 +56,33 @@
                   "maximumError": "4kb"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/enviroments/environment.ts",
+                  "with": "src/enviroments/environment.prod.ts"
+                }]
             },
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/enviroments/environment.ts",
+                  "with": "src/enviroments/environment.dev.ts"
+                }]
+            },
+
+            "local": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/enviroments/environment.ts",
+                  "with": "src/enviroments/environment.ts"
+                }]
             }
            
           },
@@ -71,19 +93,22 @@
           
           "configurations": {
             "production": {
-              "buildTarget": "HomeController:build:production"
+              "buildTarget": "omkahomeassistantview:build:production"
             },
             "development": {
-              "buildTarget": "HomeController:build:development"
+              "buildTarget": "omkahomeassistantview:build:development"
+            },
+            "local": {
+              "buildTarget": "omkahomeassistantview:build:local"
             }
           },
-          "defaultConfiguration": "development",
-          "proxyConfig": "src/proxy.conf.json"
+          "defaultConfiguration": "development"
+          
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "HomeController:build"
+            "buildTarget": "omkahomeassistantview:build"
           }
         },
         "test": {
