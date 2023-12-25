@@ -1,10 +1,98 @@
 
-<div class="container">
- <div class="row rv" *ngFor="let item of portInfoList">
-        <div class="col-8"><h4>{{item.portDesc}}</h4></div>
-        <div class="col-4"><p-toggleButton [(ngModel)]="item.pinStat" (onChange)="callbackFun($event,item.portNumber)" onLabel={{buttonTextRun}} offLabel={{buttonTextStop}}></p-toggleButton></div>
+<div class="container-fluid">
+            <div class="card">
+                <p-toolbar>
+                    <div class="p-toolbar-group-start">
+                        <h3>Nodemcu Kontrolcüsü</h3>
+                    </div>
+                    <div class="p-toolbar-group-center">
+                        
+                    </div>
+                    <div class="p-toolbar-group-end">
+                        <button pButton icon="pi pi-plus" (click)="showDialog()" class="mr-4"></button>
+                    </div>
+                </p-toolbar>
+            </div>
+
+ <div class="card rv" style="height: 100px; margin-top: 20px;" *ngFor="let item of releChannelInfoList">
+    <div class="row">
+        <div class="col-lg-9">
+           <table style="margin-left: 50px; margin-top: 20px;">
+            <tr><th colspan="3">{{item.releChannelName}}</th></tr>
+            <tr>
+                <td>{{item.portDef.portKey}}</td>
+                <td>{{item.portDef.portDesc}}</td>
+                <td>{{item.portDef.portKey}}</td>
+            </tr>
+           </table>
+        </div>
+        <div class="col-lg-2">
+        <p-toggleButton [(ngModel)]="item.releStat" 
+            (onChange)="callbackFun($event,item.portDef.portNumber)" 
+            onLabel={{buttonTextRun}} 
+            [style]="{'width':'100%', 'height':'100px','float':'right;'}" 
+            offLabel={{buttonTextStop}}>
+        </p-toggleButton>
+      </div>
+      <div class="col-lg-1">
+        <p-button [raised]="true" 
+        [style]="{'width':'100%', 'height':'100px'}"
+        icon="pi pi-angle-right" 
+        (click)="showDialog(item.id)" 
+        severity="secondary"></p-button>
+      </div>
     </div>
+     
+  </div>
+</div>
+
+
+<div class="card flex justify-content-center">
+<p-dialog header="Yeni Kanal Tanımı" [(visible)]="visible" [style]="{width: '60vw'}">
+ <form [formGroup]="releCreate"  (ngSubmit)="releSave(releCreate)">
+    <div class="row">
+       <div class="col-md-12">
+        <div class="form-group">
+          <label for="relename" class="col-form-label">Kanal Adı<span style="color: brown;" >*</span></label>
+            <input type="text"  class="form-control" formControlName="relename"   id="relename" placeholder="Kanal Adı">
+        </div>
+       </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="form-group">
+          <label for="reledesc" class="col-form-label">Kanal Açıklama<span style="color: brown;" >*</span></label>
+            <input type="text"  class="form-control" formControlName="reledesc"   id="reledesc" placeholder="Kanal Açıklama">
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="form-group ">
+       
+          <label for="portno" class="col-form-label">Kanal Port<span style="color: brown;" >*</span></label>
+          <p-dropdown
+           [options]="portList" id="portno"  [style]="{'minWidth':'100%'}" 
+           appendTo="body" 
+           formControlName="portno" optionLabel="portDesc" optionValue="portKey"></p-dropdown>
+      </div>
+    </div>
+    </div>
+    <div class="row" style="margin-top: 20px;">
+        <div class="col-sm-9"></div>
+        <div class="col-sm-1">
+          <button class="btn btn-warning mb-2" style="float: right;" type="reset">Temizle</button>
+        </div>
+        <div class="col-sm-2">
+          <button class="btn btn-primary mb-2" style="float: right;" type="submit">Kaydet</button>
+        </div>
+        </div>
+        <input type="hidden" name="id" formControlName="id"/>
+ </form>
+</p-dialog>
+
 </div>
 
 
 <router-outlet></router-outlet>
+
