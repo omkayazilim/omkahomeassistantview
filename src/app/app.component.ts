@@ -1,10 +1,14 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { PinStatResponse } from './PinStatResponse';
-import { ToggleButtonModule } from 'primeng/togglebutton';
 import { Message } from 'primeng/api';
-import { environment } from '../enviroments/environment';
-import { PortInfoDto } from './Dto/PortInfoDto';
+import { ApiclientModule } from './apiclient.module';
+import {  portDefGetUrl, releChannelCreateUrl, releChannelGetUrl, releChannelUpdateUrl, releSetValueUrl } from './ServiceConstants';
+import { ReleChannelDefListItemDto } from './Dto/ReleChannelDefListItemDto';
+import { EspSetValueRequestDto } from './Dto/EspSetValueRequestDto';
+import { PinStatResponse } from './PinStatResponse';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { ReleChannelDefCreateDto } from './Dto/ReleChannelDefCreateDto';
+import { PortDefListItemDto } from './Dto/PortDefListItemDto';
+import { ReleChannelDefUpdateDto } from './Dto/ReleChannelDefUpdateDto';
 
 @Component({
   selector: 'app-root',
@@ -16,50 +20,136 @@ export class AppComponent implements OnInit {
   messages: Message[] =[];
   buttonTextRun:string="Açık";
   buttonTextStop:string="Kapalı";
-
-  portInfoList:PortInfoDto[]=[];
-
+  releChannelInfoList:ReleChannelDefListItemDto[]=[];
   serverurl:string="";
-  constructor(private client:HttpClient)
+  releCreate!:FormGroup;
+  postModel!:ReleChannelDefCreateDto;
+  portList!:PortDefListItemDto[];
+  peopleLoading:boolean=false;
+  dropdown!:string;
+  constructor(private client:ApiclientModule,private formBuilder: FormBuilder)
   {
     
   }
+  visible: boolean = false;
+
+  visibleChannelEdit: boolean = false;
+
+  showDialog(id?:number) {
+    if(id==null){
+      this.visible = true;
+    }
+    else{
+      let selected= this.releChannelInfoList.find(x=>x.id==id)??new ReleChannelDefListItemDto();
+      this.visible = true;
+      this.createReleChannelFormBuilder(selected);
+    }
+      
+  }
+
   ngOnInit(): void
    {
-    const env = '{{APP_ENV}}'.replace(/^\s+|\s+$/g, '');
-    this.serverurl= environment.serverUrl;
-    console.log("ortm değişkeni",env);
-    this.getPortinfo()
+    let model= new ReleChannelDefListItemDto();
+    model.portDef=new PortDefListItemDto();
+   this.createReleChannelFormBuilder(model);
+   this.getReleChannelList();
+   this.getPortDefList();
   }
-  setPinValue(pin:Number,stat:boolean)
+
+getPortDefList()
+{
+  this.client.get<PortDefListItemDto[]>(portDefGetUrl,this,x=>
+  { console.log("Port Kayıtları",x)
+    this.portList=x;
+  });
+}
+
+getReleChannelList()
+{
+  this.client.get<ReleChannelDefListItemDto[]>(releChannelGetUrl,this,x=>
+  { console.log("Röle Kayıtları",x)
+    this.releChannelInfoList=x;
+  });
+}
+
+callbackFun(event:any,pin:number)
+{
+   let check:boolean=event.checked?false:true;
+   this.setPinValue(pin,check)
+}
+
+setPinValue(pin:number,stat:boolean)
+{
+  let request:EspSetValueRequestDto= new EspSetValueRequestDto();
+  request.Pin=pin;
+  request.Stat=stat;
+  this.client.post<PinStatResponse[],EspSetValueRequestDto>(this.serverurl+releSetValueUrl,request,this,x=>{})
+}
+public releSave(releChannelCreate:FormGroup)
+{
+
+  let reledefCreate= new ReleChannelDefCreateDto();
+  let reledefEdit = new ReleChannelDefUpdateDto();
+  if(!releChannelCreate.invalid)
   {
-    this.client.post<PinStatResponse[]>(this.serverurl+"Esp/EspSetValue",{pin:pin,stat:stat}).subscribe(x=>{
-      this.getPortinfo();
-      this.messages = [{ severity: 'success', summary: 'Success', detail: 'Esp Modül bağlantısı Başarılı' }];
-    },e=>{
-
-      this.messages = [{ severity: 'error', summary: 'Error', detail:"Modüle Erişilemedi"}];
-    }
-    );
+    let id:number=releChannelCreate.value["id"];
+    let isActive=true;
+    let channelDesc=releChannelCreate.value["reledesc"];
+    let channelName= releChannelCreate.value["relename"];
+    let portno:String=releChannelCreate.value["portno"];
+    let prt =this.portList.find(x=> x.portKey===portno)
+  
+  if(id==null)
+  {
+    reledefCreate.isActive=true;
+    reledefCreate.releChannelDesc=channelDesc;
+    reledefCreate.releChannelName=channelName;
+    reledefCreate.espPortDefId=prt?.id??0;
+    this.client.put<String,ReleChannelDefCreateDto>(releChannelCreateUrl,reledefCreate,this,x=>
+      {
+          this.visible = false;
+           this.getReleChannelList();
+      });
   }
-
+  else
+  {
+    reledefEdit.id=id
+    reledefEdit.isActive=true;
+    reledefEdit.releChannelDesc=channelDesc;
+    reledefEdit.releChannelName=channelName;
+    reledefEdit.espPortDefId=prt?.id??0;
+    console.log("Edit rele",reledefEdit);
+    this.client.post<String,ReleChannelDefCreateDto>(releChannelUpdateUrl,reledefEdit,this,x=>
+      {
+          this.visible = false;
+           this.getReleChannelList();
+      });
+   
+  }
+  
   
 
-   callbackFun(event:any,pin:number)
-   {
-      let check:boolean=event.checked?false:true;
-      this.setPinValue(pin,check)
-   }
+ 
+     
+  }
+  else console.error("İnvalid");
+  
+}
 
-   getPortinfo()
-   {
-    this.client.get<PortInfoDto[]>(this.serverurl+"Esp/GetPortProps").subscribe(x=>{
-       console.log(x);
-       this.portInfoList=x;
-    },e=>{
-      this.messages = [{ severity: 'error', summary: 'Error', detail:"Modüle Erişilemedi"}];
-    });
+public createReleChannelFormBuilder(data:ReleChannelDefListItemDto)
+ {
+   let key:string=data.portDef.portKey;
+   this.releCreate = new FormGroup({
+    relename: new FormControl(data.releChannelName,[Validators.required]),
+    reledesc: new FormControl(data.releChannelDesc,[Validators.required]),
+    portno: new FormControl("00",[Validators.required]),
+    id:new FormControl(data.id),
+  });
 
-   }
+}
+
+
+
+
 
 }
